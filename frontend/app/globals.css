@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-brand-50 text-brand-700 font-sans antialiased;
+}
+
+/* Small utility classes used across pages */
+.card {
+  @apply bg-white rounded-lg shadow-sm ring-1 ring-brand-100 p-6;
+}
+
+.btn {
+  @apply inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium
+         focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-400
+         transition;
+}
+
+.btn-primary { @apply btn bg-brand-600 text-white hover:bg-brand-700; }
+.btn-secondary { @apply btn bg-white text-brand-700 ring-1 ring-brand-100 hover:bg-brand-50; }
+.btn-danger { @apply btn bg-risk-high text-white hover:bg-red-800; }
+
+.status-badge {
+  @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium;
+}
+.status-AUTO_APPROVED  { @apply status-badge bg-green-50 text-risk-low; }
+.status-HUMAN_APPROVED { @apply status-badge bg-green-50 text-risk-low; }
+.status-NEEDS_REVIEW   { @apply status-badge bg-amber-50 text-risk-medium; }
+.status-HIGH_RISK      { @apply status-badge bg-red-50 text-risk-high; }
+.status-PENDING        { @apply status-badge bg-slate-100 text-slate-600; }
+.status-REJECTED       { @apply status-badge bg-slate-100 text-slate-600; }
+
+.severity-HIGH   { @apply text-risk-high; }
+.severity-MEDIUM { @apply text-risk-medium; }
+.severity-LOW    { @apply text-brand-400; }

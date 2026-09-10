@@ -1,0 +1,153 @@
+{
+  "_meta": {
+    "description": "Mapping from Indian state name (as it appears normalized in extracted records) to the public government land-record portal for that state. Used by the Review UI to provide a 'Open Official Land Record Portal' button. BhoomiLens does not scrape, automate, or bypass any protection on these portals. URLs must be manually verified periodically.",
+    "last_verified": "2026-01-01",
+    "verification_reminder": "Verify each URL loads over HTTPS and belongs to a state / central government domain (.gov.in / .nic.in) before every release. If a URL is dead, disable it in the UI rather than pointing at a replacement of unknown provenance."
+  },
+  "portals": {
+    "uttar pradesh": {
+      "label": "UP Bhulekh",
+      "url": "https://upbhulekh.gov.in/",
+      "cadastral_map_url": null,
+      "notes": "Portal supports search by khasra + village. Requires captcha; do not automate."
+    },
+    "madhya pradesh": {
+      "label": "MP Bhulekh",
+      "url": "https://mpbhulekh.gov.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "bihar": {
+      "label": "Bihar Bhumi (Land Records & Survey)",
+      "url": "https://biharbhumi.bihar.gov.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "rajasthan": {
+      "label": "Apna Khata (Rajasthan)",
+      "url": "https://apnakhata.rajasthan.gov.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "maharashtra": {
+      "label": "Mahabhulekh (Maharashtra)",
+      "url": "https://bhulekh.mahabhumi.gov.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "gujarat": {
+      "label": "AnyRoR Gujarat",
+      "url": "https://anyror.gujarat.gov.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "karnataka": {
+      "label": "Bhoomi (Karnataka RTC)",
+      "url": "https://landrecords.karnataka.gov.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "tamil nadu": {
+      "label": "TN Patta Chitta",
+      "url": "https://eservices.tn.gov.in/",
+      "cadastral_map_url": null,
+      "notes": "Login through TN eServices; land records via the Revenue department flow."
+    },
+    "andhra pradesh": {
+      "label": "AP Meebhoomi",
+      "url": "https://meebhoomi.ap.gov.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "telangana": {
+      "label": "Dharani (Telangana)",
+      "url": "https://dharani.telangana.gov.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "west bengal": {
+      "label": "Banglar Bhumi",
+      "url": "https://banglarbhumi.gov.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "odisha": {
+      "label": "Bhulekh Odisha",
+      "url": "https://bhulekh.ori.nic.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "punjab": {
+      "label": "Punjab Land Records (PLRS)",
+      "url": "https://plrs.org.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "haryana": {
+      "label": "Jamabandi Haryana",
+      "url": "https://jamabandi.nic.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "himachal pradesh": {
+      "label": "HP Bhulekh (Himbhoomi)",
+      "url": "https://himachal.nic.in/",
+      "cadastral_map_url": null,
+      "notes": "Himbhoomi land records reached via the state portal Revenue section."
+    },
+    "uttarakhand": {
+      "label": "Devbhoomi (Uttarakhand)",
+      "url": "https://bhulekh.uk.gov.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "kerala": {
+      "label": "e-Rekha Kerala",
+      "url": "https://erekha.kerala.gov.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "jharkhand": {
+      "label": "Jharbhoomi",
+      "url": "https://jharbhoomi.jharkhand.gov.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "chhattisgarh": {
+      "label": "Bhuiyan (Chhattisgarh)",
+      "url": "https://bhuiyan.cg.nic.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "assam": {
+      "label": "Dharitree (Assam)",
+      "url": "https://revenueassam.nic.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "goa": {
+      "label": "Goa Land Records",
+      "url": "https://egov.goa.nic.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "delhi": {
+      "label": "Delhi Online (Revenue)",
+      "url": "https://dlrc.delhi.gov.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "jammu and kashmir": {
+      "label": "J&K Land Records",
+      "url": "https://jklrms.jk.gov.in/",
+      "cadastral_map_url": null,
+      "notes": ""
+    },
+    "_default": {
+      "label": "India — National Generic Document Registration System",
+      "url": "https://dilrmp.gov.in/",
+      "cadastral_map_url": null,
+      "notes": "Used when the extracted state does not match any known portal. Links to the central Digital India Land Records Modernisation Programme site."
+    }
+  }
+}

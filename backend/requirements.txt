@@ -1,0 +1,16 @@
+# Runtime deps for Lambda handlers.
+# Kept as small as possible — boto3 is provided by the Lambda runtime and
+# only listed here for local development.
+
+boto3>=1.34,<2.0
+
+# Optional but recommended: robust Devanagari <-> Latin transliteration.
+# The normalization module falls back to a tiny hint map if this is absent,
+# but Hindi record accuracy is markedly better when the library is bundled.
+indic-transliteration>=2.3.0
+
+# Structured logging in a Lambda-friendly shape.
+aws-lambda-powertools>=2.30.0
+
+# Dev / test-only deps live in tests/requirements-dev.txt to keep the
+# Lambda deployment package small.

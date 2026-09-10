@@ -1,0 +1,56 @@
+# --- Secrets ---
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+aws-credentials.json
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# --- Node / Frontend ---
+node_modules/
+.next/
+out/
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+
+# --- CDK ---
+cdk.out/
+cdk.context.json
+.cdk.staging/
+
+# --- Docker / OCR ---
+ocr/.model_cache/
+*.tar
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+desktop.ini
+Thumbs.db
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Local data (uploads, test artifacts) ---
+data/uploads/
+data/local_test_outputs/
+scripts/local_output/

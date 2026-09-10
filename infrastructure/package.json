@@ -1,0 +1,29 @@
+{
+  "name": "bhoomilens-infrastructure",
+  "version": "0.1.0",
+  "private": true,
+  "bin": {
+    "bhoomilens": "bin/bhoomilens.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "synth": "cdk synth",
+    "deploy:all": "cdk deploy --all --require-approval never",
+    "deploy:storage": "cdk deploy BhoomiLens-Storage",
+    "deploy:auth": "cdk deploy BhoomiLens-Auth",
+    "deploy:workflow": "cdk deploy BhoomiLens-Workflow",
+    "deploy:api": "cdk deploy BhoomiLens-Api"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "aws-cdk": "^2.135.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.135.0",
+    "constructs": "^10.3.0"
+  }
+}

@@ -1,0 +1,285 @@
+{
+  "_meta": {
+    "description": "Ground-truth test scenarios for BhoomiLens validation. Each scenario simulates a document upload with a known extracted payload and lists the expected validation flags and final status. scripts/evaluate.py uses this file to compute measured per-rule accuracy. Do NOT report these as real accuracy numbers on the dashboard — dashboard accuracy must come from running evaluate.py at demo time.",
+    "reference_registry_source": "data/reference_registry.json"
+  },
+  "scenarios": [
+    {
+      "id": "T01_clean_english",
+      "title": "Correct record — printed English",
+      "language": "en",
+      "extracted": {
+        "owner_name": "Ram Prasad",
+        "father_or_spouse_name": "Shyam Lal",
+        "khasra_number": "117/2",
+        "khata_number": "284",
+        "area": 2.5,
+        "area_unit": "hectare",
+        "village": "Rampur",
+        "tehsil": "Sadar",
+        "district": "Lucknow",
+        "state": "Uttar Pradesh",
+        "registration_number": "REG-UP-2019-00117",
+        "mutation_date": "2019-06-14"
+      },
+      "ocr_confidence": 0.96,
+      "extraction_confidence": 0.92,
+      "expected_flags": [],
+      "expected_status": "AUTO_APPROVED"
+    },
+    {
+      "id": "T02_area_mismatch",
+      "title": "Wrong area — should catch AREA_MISMATCH",
+      "language": "en",
+      "extracted": {
+        "owner_name": "Ram Prasad",
+        "khasra_number": "117/2",
+        "khata_number": "284",
+        "area": 5.2,
+        "area_unit": "hectare",
+        "village": "Rampur",
+        "tehsil": "Sadar",
+        "district": "Lucknow",
+        "state": "Uttar Pradesh"
+      },
+      "ocr_confidence": 0.94,
+      "extraction_confidence": 0.88,
+      "expected_flags": ["AREA_MISMATCH"],
+      "expected_status": "NEEDS_REVIEW"
+    },
+    {
+      "id": "T03_owner_mismatch",
+      "title": "Wrong owner — should catch OWNER_MISMATCH",
+      "language": "en",
+      "extracted": {
+        "owner_name": "Sunita Sharma",
+        "khasra_number": "117/2",
+        "khata_number": "284",
+        "area": 2.5,
+        "area_unit": "hectare",
+        "village": "Rampur",
+        "state": "Uttar Pradesh"
+      },
+      "ocr_confidence": 0.93,
+      "extraction_confidence": 0.90,
+      "expected_flags": ["OWNER_MISMATCH"],
+      "expected_status": "NEEDS_REVIEW"
+    },
+    {
+      "id": "T04_duplicate_khasra",
+      "title": "Same Khasra + village as an existing approved record",
+      "language": "en",
+      "preload_records": [
+        {
+          "khasra_number": "117/2",
+          "village": "Rampur",
+          "state": "Uttar Pradesh",
+          "validation_status": "AUTO_APPROVED",
+          "updated_at_days_ago": 30
+        }
+      ],
+      "extracted": {
+        "owner_name": "Ram Prasad",
+        "khasra_number": "117/2",
+        "khata_number": "284",
+        "area": 2.5,
+        "area_unit": "hectare",
+        "village": "Rampur",
+        "state": "Uttar Pradesh"
+      },
+      "ocr_confidence": 0.95,
+      "extraction_confidence": 0.91,
+      "expected_flags": ["DUPLICATE_KHASRA"],
+      "expected_status": "NEEDS_REVIEW"
+    },
+    {
+      "id": "T05_missing_field",
+      "title": "Missing Khasra number — MISSING_REQUIRED_FIELD",
+      "language": "en",
+      "extracted": {
+        "owner_name": "Ram Prasad",
+        "khata_number": "284",
+        "area": 2.5,
+        "area_unit": "hectare",
+        "village": "Rampur",
+        "state": "Uttar Pradesh"
+      },
+      "ocr_confidence": 0.72,
+      "extraction_confidence": 0.65,
+      "expected_flags": ["MISSING_REQUIRED_FIELD"],
+      "expected_status": "NEEDS_REVIEW"
+    },
+    {
+      "id": "T06_location_mismatch",
+      "title": "Khasra exists but in a different village — LOCATION_INCONSISTENCY",
+      "language": "en",
+      "extracted": {
+        "owner_name": "Ram Prasad",
+        "khasra_number": "117/2",
+        "area": 2.5,
+        "area_unit": "hectare",
+        "village": "Bhopal",
+        "state": "Madhya Pradesh"
+      },
+      "ocr_confidence": 0.90,
+      "extraction_confidence": 0.85,
+      "expected_flags": ["LOCATION_INCONSISTENCY"],
+      "expected_status": "NEEDS_REVIEW"
+    },
+    {
+      "id": "T07_poor_quality_scan",
+      "title": "Low OCR confidence — LOW_OCR_CONFIDENCE, drops below 70 threshold → HIGH_RISK",
+      "language": "en",
+      "extracted": {
+        "owner_name": "Ram Prasad",
+        "khasra_number": "117/2",
+        "khata_number": "284",
+        "area": 2.5,
+        "area_unit": "hectare",
+        "village": "Rampur",
+        "state": "Uttar Pradesh"
+      },
+      "ocr_confidence": 0.52,
+      "extraction_confidence": 0.55,
+      "expected_flags": ["LOW_OCR_CONFIDENCE"],
+      "expected_status": "HIGH_RISK"
+    },
+    {
+      "id": "T08_handwritten_ambiguous",
+      "title": "Ambiguous handwriting — null area is not a hard-required field, but low confidence lands NEEDS_REVIEW",
+      "language": "en",
+      "extracted": {
+        "owner_name": "Ram Prasad",
+        "khasra_number": "117/2",
+        "khata_number": "284",
+        "area": null,
+        "area_unit": null,
+        "village": "Rampur",
+        "state": "Uttar Pradesh"
+      },
+      "ocr_confidence": 0.68,
+      "extraction_confidence": 0.60,
+      "expected_flags": [],
+      "expected_status": "NEEDS_REVIEW"
+    },
+    {
+      "id": "T09_hindi_correct",
+      "title": "Hindi record — owner in Devanagari; transliteration matches, but OCR confidence keeps it in review",
+      "language": "hi",
+      "extracted": {
+        "owner_name": "राम प्रसाद",
+        "khasra_number": "117/2",
+        "khata_number": "284",
+        "area": 2.5,
+        "area_unit": "hectare",
+        "village": "रामपुर",
+        "state": "उत्तर प्रदेश"
+      },
+      "ocr_confidence": 0.83,
+      "extraction_confidence": 0.79,
+      "expected_flags": [],
+      "expected_status": "NEEDS_REVIEW"
+    },
+    {
+      "id": "T10_english_correct_bigha",
+      "title": "Rajasthan bigha unit conversion — must normalize to m² correctly",
+      "language": "en",
+      "extracted": {
+        "owner_name": "Bhanwar Singh Rathore",
+        "khasra_number": "33/1",
+        "khata_number": "155",
+        "area": 2,
+        "area_unit": "bigha",
+        "village": "Khejarli",
+        "district": "Jodhpur",
+        "state": "Rajasthan"
+      },
+      "ocr_confidence": 0.91,
+      "extraction_confidence": 0.87,
+      "expected_flags": [],
+      "expected_status": "AUTO_APPROVED"
+    },
+    {
+      "id": "T11_mixed_wrong_area_and_owner",
+      "title": "Two issues at once — AREA_MISMATCH + OWNER_MISMATCH",
+      "language": "en",
+      "extracted": {
+        "owner_name": "Mahesh Sharma",
+        "khasra_number": "117/2",
+        "khata_number": "284",
+        "area": 10,
+        "area_unit": "hectare",
+        "village": "Rampur",
+        "state": "Uttar Pradesh"
+      },
+      "ocr_confidence": 0.88,
+      "extraction_confidence": 0.82,
+      "expected_flags": ["OWNER_MISMATCH", "AREA_MISMATCH"],
+      "expected_status": "NEEDS_REVIEW"
+    },
+    {
+      "id": "T12_invalid_area",
+      "title": "Impossible area (11000 hectare) — INVALID_NUMERIC_AREA",
+      "language": "en",
+      "extracted": {
+        "owner_name": "Ram Prasad",
+        "khasra_number": "117/2",
+        "area": 11000,
+        "area_unit": "hectare",
+        "village": "Rampur",
+        "state": "Uttar Pradesh"
+      },
+      "ocr_confidence": 0.60,
+      "extraction_confidence": 0.55,
+      "expected_flags": ["INVALID_NUMERIC_AREA"],
+      "expected_status": "NEEDS_REVIEW"
+    },
+    {
+      "id": "T13_khata_mismatch",
+      "title": "Correct owner + khasra but wrong khata — KHATA_MISMATCH (medium)",
+      "language": "en",
+      "extracted": {
+        "owner_name": "Ram Prasad",
+        "khasra_number": "117/2",
+        "khata_number": "999",
+        "area": 2.5,
+        "area_unit": "hectare",
+        "village": "Rampur",
+        "state": "Uttar Pradesh"
+      },
+      "ocr_confidence": 0.94,
+      "extraction_confidence": 0.89,
+      "expected_flags": ["KHATA_MISMATCH"],
+      "expected_status": "NEEDS_REVIEW"
+    },
+    {
+      "id": "T14_area_unit_conversion_correct",
+      "title": "Extracted 25000 square meter — must equal 2.5 hectare after normalization",
+      "language": "en",
+      "extracted": {
+        "owner_name": "Ram Prasad",
+        "khasra_number": "117/2",
+        "khata_number": "284",
+        "area": 25000,
+        "area_unit": "square meter",
+        "village": "Rampur",
+        "state": "Uttar Pradesh"
+      },
+      "ocr_confidence": 0.90,
+      "extraction_confidence": 0.86,
+      "expected_flags": [],
+      "expected_status": "AUTO_APPROVED"
+    },
+    {
+      "id": "T15_after_correction_should_flip",
+      "title": "T02 corrected by reviewer — after PUT with area=2.5, status should become HUMAN_APPROVED",
+      "language": "en",
+      "starting_scenario": "T02_area_mismatch",
+      "reviewer_correction": {
+        "area": 2.5
+      },
+      "expected_flags_after_correction": [],
+      "expected_status_after_correction": "HUMAN_APPROVED"
+    }
+  ]
+}

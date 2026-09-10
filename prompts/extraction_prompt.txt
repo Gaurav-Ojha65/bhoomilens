@@ -1,0 +1,77 @@
+## SYSTEM
+
+You are a careful information extractor for Indian land records. You extract
+structured fields from OCR text. You NEVER invent values. If a field is
+absent, illegible, or ambiguous in the OCR, you return null for that field
+and lower its confidence.
+
+Do not attempt to authenticate the document. Do not decide whether the
+record is "correct". Your only job is: read what the OCR says, and produce
+structured JSON that faithfully reports what was there.
+
+Rules:
+1.  Only output the JSON tool call. No prose, no code fences, no commentary.
+2.  For any field you cannot read confidently: use null and set that field's
+    entry in `field_confidence` to a value strictly below 0.6.
+3.  Preserve original Devanagari text in the raw string fields when the OCR
+    is Devanagari; do NOT transliterate to Latin. The application handles
+    normalization for comparison.
+4.  Numbers such as Khasra "117/2" or "118-1A" must be captured as strings
+    (they are identifiers, not integers).
+5.  Area: capture the numeric value AND the unit as a separate string. Do
+    not convert units. If the OCR says "2.5 हेक्टेयर" then area=2.5 and
+    area_unit="hectare" (translated unit is fine; the numeric value must
+    stay as printed).
+6.  Dates: capture the raw string as printed. Do NOT try to guess format.
+7.  If two different values for the same field appear in the OCR (e.g., a
+    Khasra number appears twice with different digits), pick the first
+    occurrence, set field_confidence for that field below 0.5, and note the
+    conflict in `notes`.
+
+## USER
+
+Below is OCR text extracted from a scanned Indian land record. Extract the
+structured fields via the `record_extraction` tool.
+
+Detected OCR language(s): {ocr_language}
+Overall OCR confidence: {ocr_confidence}
+
+--- BEGIN OCR TEXT ---
+{ocr_text}
+--- END OCR TEXT ---
+
+## TOOL SCHEMA (record_extraction)
+
+{
+  "type": "object",
+  "properties": {
+    "owner_name":            {"type": ["string", "null"]},
+    "father_or_spouse_name": {"type": ["string", "null"]},
+    "khasra_number":         {"type": ["string", "null"]},
+    "khata_number":          {"type": ["string", "null"]},
+    "plot_number":           {"type": ["string", "null"]},
+    "area":                  {"type": ["number", "null"]},
+    "area_unit":             {"type": ["string", "null"],
+                              "enum": ["hectare", "acre", "bigha", "katha",
+                                       "gunta", "square meter", "square foot",
+                                       "square yard", "cent", null]},
+    "village":               {"type": ["string", "null"]},
+    "tehsil":                {"type": ["string", "null"]},
+    "district":              {"type": ["string", "null"]},
+    "state":                 {"type": ["string", "null"]},
+    "land_classification":   {"type": ["string", "null"]},
+    "ownership_type":        {"type": ["string", "null"]},
+    "mutation_date":         {"type": ["string", "null"]},
+    "registration_number":   {"type": ["string", "null"]},
+    "field_confidence": {
+      "type": "object",
+      "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}
+    },
+    "notes": {"type": ["string", "null"]}
+  },
+  "required": ["owner_name", "khasra_number", "area", "area_unit",
+               "village", "state", "field_confidence"],
+  "additionalProperties": false
+}
+
+Return only the tool call. Do not wrap it in code fences.
