@@ -9,22 +9,25 @@ export interface AuthStackProps extends StackProps {
 }
 
 /**
- * Cognito user pool + client + identity pool.
+ * Cognito authentication + application roles.
  *
- * MVP has one Reviewer role. RBAC decomposition is deliberately out of
- * scope (spec Section 3): "do not waste time implementing complicated RBAC".
+ * USER is the normal BhoomiLens role.
+ * SUPERVISOR inherits normal application access and is granted additional
+ * supervision capabilities by application authorization checks.
  */
 export class AuthStack extends Stack {
   public readonly userPool: cognito.UserPool;
   public readonly userPoolClient: cognito.UserPoolClient;
   public readonly identityPool: cognito.CfnIdentityPool;
+  public readonly userGroup: cognito.CfnUserPoolGroup;
+  public readonly supervisorGroup: cognito.CfnUserPoolGroup;
 
   constructor(scope: Construct, id: string, props: AuthStackProps) {
     super(scope, id, props);
 
     this.userPool = new cognito.UserPool(this, 'UserPool', {
       userPoolName: 'bhoomilens-reviewers',
-      selfSignUpEnabled: false, // admin-created accounts only
+      selfSignUpEnabled: false,
       signInAliases: { email: true },
       standardAttributes: {
         email: { required: true, mutable: true },
@@ -40,68 +43,67 @@ export class AuthStack extends Stack {
       accountRecovery: cognito.AccountRecovery.EMAIL_ONLY,
       mfa: cognito.Mfa.OPTIONAL,
       mfaSecondFactor: { sms: false, otp: true },
-      deletionProtection: false, // hackathon
+      deletionProtection: false,
     });
 
     this.userPoolClient = new cognito.UserPoolClient(this, 'UserPoolClient', {
       userPool: this.userPool,
-      generateSecret: false, // SPA client
-      authFlows: {
-        userPassword: true,
-        userSrp: true,
-      },
+      generateSecret: false,
+      authFlows: { userPassword: true, userSrp: true },
       idTokenValidity: Duration.hours(1),
       accessTokenValidity: Duration.hours(1),
       refreshTokenValidity: Duration.days(30),
       preventUserExistenceErrors: true,
     });
 
-    this.identityPool = new cognito.CfnIdentityPool(this, 'IdentityPool', {
-      allowUnauthenticatedIdentities: false,
-      cognitoIdentityProviders: [
-        {
-          clientId: this.userPoolClient.userPoolClientId,
-          providerName: this.userPool.userPoolProviderName,
-        },
-      ],
+    this.userGroup = new cognito.CfnUserPoolGroup(this, 'UserGroup', {
+      userPoolId: this.userPool.userPoolId,
+      groupName: 'USER',
+      description: 'Standard BhoomiLens application user',
+      precedence: 20,
     });
 
-    // Authenticated role — used by the browser via Amplify to call S3 PUT
-    // on presigned URLs (the presigned URL already carries authorization,
-    // but Amplify sometimes requires a valid credential context to fire
-    // the request; the role has no additional bucket permissions).
+    this.supervisorGroup = new cognito.CfnUserPoolGroup(this, 'SupervisorGroup', {
+      userPoolId: this.userPool.userPoolId,
+      groupName: 'SUPERVISOR',
+      description: 'BhoomiLens supervisor with additional supervision access',
+      precedence: 10,
+    });
+
+    this.identityPool = new cognito.CfnIdentityPool(this, 'IdentityPool', {
+      allowUnauthenticatedIdentities: false,
+      cognitoIdentityProviders: [{
+        clientId: this.userPoolClient.userPoolClientId,
+        providerName: this.userPool.userPoolProviderName,
+      }],
+    });
+
     const authenticatedRole = new iam.Role(this, 'CognitoAuthenticatedRole', {
       assumedBy: new iam.FederatedPrincipal(
         'cognito-identity.amazonaws.com',
         {
-          StringEquals: {
-            'cognito-identity.amazonaws.com:aud': this.identityPool.ref,
-          },
-          'ForAnyValue:StringLike': {
-            'cognito-identity.amazonaws.com:amr': 'authenticated',
-          },
+          StringEquals: { 'cognito-identity.amazonaws.com:aud': this.identityPool.ref },
+          'ForAnyValue:StringLike': { 'cognito-identity.amazonaws.com:amr': 'authenticated' },
         },
         'sts:AssumeRoleWithWebIdentity',
       ),
       description: 'BhoomiLens authenticated user role',
     });
-    // Intentionally minimal — API Gateway does the real authorization.
-    authenticatedRole.addToPolicy(
-      new iam.PolicyStatement({
-        actions: ['cognito-identity:GetCredentialsForIdentity'],
-        resources: ['*'],
-      }),
-    );
+
+    authenticatedRole.addToPolicy(new iam.PolicyStatement({
+      actions: ['cognito-identity:GetCredentialsForIdentity'],
+      resources: ['*'],
+    }));
 
     new cognito.CfnIdentityPoolRoleAttachment(this, 'IdentityPoolRoles', {
       identityPoolId: this.identityPool.ref,
-      roles: {
-        authenticated: authenticatedRole.roleArn,
-      },
+      roles: { authenticated: authenticatedRole.roleArn },
     });
 
     new CfnOutput(this, 'UserPoolId', { value: this.userPool.userPoolId });
     new CfnOutput(this, 'UserPoolClientId', { value: this.userPoolClient.userPoolClientId });
     new CfnOutput(this, 'IdentityPoolId', { value: this.identityPool.ref });
+    new CfnOutput(this, 'UserGroupName', { value: this.userGroup.groupName! });
+    new CfnOutput(this, 'SupervisorGroupName', { value: this.supervisorGroup.groupName! });
   }
 }
