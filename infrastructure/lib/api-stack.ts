@@ -202,6 +202,14 @@ export class ApiStack extends Stack {
       authOpts,
     );
 
+    // Supervisor-only application endpoint. The Lambda checks the Cognito
+    // group claim as a second authorization boundary.
+    this.api.root.addResource('supervisor').addResource('users').addMethod(
+      'GET',
+      new apigw.LambdaIntegration(dashboardFn),
+      authOpts,
+    );
+
     new CfnOutput(this, 'ApiEndpoint', { value: this.api.url });
   }
 }
