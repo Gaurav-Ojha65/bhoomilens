@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AmplifyProvider } from "@/components/AmplifyProvider";
+import { RoleAwareNav } from "@/components/RoleAwareNav";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -19,24 +20,11 @@ export default function RootLayout({
       <body>
         <AmplifyProvider>
           <header className="bg-brand-700 text-white">
-            <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-6">
               <Link href="/" className="text-lg font-semibold tracking-tight">
                 BhoomiLens
               </Link>
-              <nav className="text-sm flex gap-6">
-                <Link href="/dashboard" className="hover:text-brand-100">
-                  Dashboard
-                </Link>
-                <Link href="/upload" className="hover:text-brand-100">
-                  Upload
-                </Link>
-                <Link href="/records" className="hover:text-brand-100">
-                  Records
-                </Link>
-                <Link href="/review-queue" className="hover:text-brand-100">
-                  Review Queue
-                </Link>
-              </nav>
+              <RoleAwareNav />
             </div>
           </header>
           <main className="max-w-7xl mx-auto px-6 py-8">{children}</main>
