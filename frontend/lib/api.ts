@@ -86,6 +86,16 @@ export type DashboardMetrics = {
   generated_at: string;
 };
 
+export type SupervisorUser = {
+  email: string;
+  records: number;
+  last_activity?: string | null;
+  needs_review: number;
+  high_risk: number;
+  approved: number;
+  rejected: number;
+};
+
 export type AuditEntry = {
   record_id: string;
   timestamp: string;
@@ -128,4 +138,5 @@ export const api = {
   reviewQueue: () => req<{ items: Record[] }>("/review-queue"),
   dashboard: () => req<DashboardMetrics>("/dashboard/metrics"),
   audit: (id: string) => req<{ items: AuditEntry[] }>(`/records/${encodeURIComponent(id)}/audit`),
+  supervisorUsers: () => req<{ items: SupervisorUser[] }>("/supervisor/users"),
 };
